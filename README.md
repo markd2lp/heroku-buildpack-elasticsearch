@@ -10,7 +10,7 @@ Add to your `app.json`:
 {
   "buildpacks": [
     {
-      "url": "https://github.com/FleetPanda/heroku-buildpack-elasticsearch"
+      "url": "https://github.com/markd2lp/heroku-buildpack-elasticsearch"
     }
   ]
 }
