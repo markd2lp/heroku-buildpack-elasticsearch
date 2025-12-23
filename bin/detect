@@ -1,0 +1,11 @@
+#!/bin/bash
+# Detect if Elasticsearch should be installed
+
+if [ -f "$1/Gemfile" ]; then
+  if grep -q "elasticsearch\|searchkick" "$1/Gemfile"; then
+    echo "Elasticsearch"
+    exit 0
+  fi
+fi
+
+exit 1

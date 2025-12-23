@@ -1,0 +1,45 @@
+#!/bin/bash
+set -e
+
+BUILD_DIR=$1
+CACHE_DIR=$2
+ENV_DIR=$3
+
+ELASTICSEARCH_VERSION="7.10.2"
+ELASTICSEARCH_URL="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ELASTICSEARCH_VERSION}-linux-x86_64.tar.gz"
+ELASTICSEARCH_HOME="$BUILD_DIR/.elasticsearch"
+
+echo "-----> Installing Elasticsearch ${ELASTICSEARCH_VERSION}"
+
+mkdir -p "$ELASTICSEARCH_HOME"
+
+cd "$BUILD_DIR"
+echo "       Downloading Elasticsearch..."
+curl -s -L "$ELASTICSEARCH_URL" | tar xz
+
+mv elasticsearch-${ELASTICSEARCH_VERSION} "$ELASTICSEARCH_HOME"
+
+mkdir -p "$BUILD_DIR/bin"
+
+cat > "$BUILD_DIR/bin/start-elasticsearch.sh" << 'SCRIPT'
+#!/bin/bash
+export ES_JAVA_OPTS="-Xms512m -Xmx512m"
+$ELASTICSEARCH_HOME/bin/elasticsearch -d -p /tmp/es.pid
+
+echo "Waiting for Elasticsearch to start..."
+for i in {1..60}; do
+  if curl -s http://localhost:9200/ > /dev/null 2>&1; then
+    echo "Elasticsearch is ready!"
+    exit 0
+  fi
+  echo "Attempt $i/60..."
+  sleep 1
+done
+
+echo "Elasticsearch failed to start"
+exit 1
+SCRIPT
+
+chmod +x "$BUILD_DIR/bin/start-elasticsearch.sh"
+
+echo "-----> Elasticsearch ${ELASTICSEARCH_VERSION} installed"

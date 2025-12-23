@@ -1,0 +1,8 @@
+#!/bin/bash
+
+cat << 'EOF'
+---
+config_vars:
+  ELASTICSEARCH_HOME: .elasticsearch
+  ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+EOF
